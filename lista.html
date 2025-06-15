@@ -60,6 +60,7 @@
   const inputData = tr.querySelector('input[name="data"]');
   const hoje = new Date().toISOString().split('T')[0];
   inputData.max = hoje;
+  
 });
         })
         .catch(err => {
@@ -70,12 +71,22 @@
 
     // Função para editar um investimento
     function editarInvestimento(id, btn) {
+      
         if (!confirm('Confirma essa alteração?')) return; // Confirma a edição com o usuário
       const tr = btn.closest('tr'); // Seleciona a linha correspondente ao botão clicado
       const nome = tr.querySelector('input[name="nome"]').value; // Obtém o valor do campo nome
       const tipo = tr.querySelector('select[name="tipo"]').value; // Obtém o valor do campo tipo
       const data = tr.querySelector('input[name="data"]').value; // Obtém o valor do campo data
       const valor = tr.querySelector('input[name="valor"]').value; // Obtém o valor do campo valor
+
+      const dataAtual = new Date();
+      const dataDigitada = new Date(data);
+
+      // Validação
+      if (dataDigitada > dataAtual || valor <= 0 || !nome || !tipo || !data) {
+      alert('Valores invalidos: Verifique os campos digitados.');
+      return;
+      }
 
       // Cria FormData para enviar via POST
       // Adiciona os dados do investimento
@@ -87,12 +98,13 @@
       formData.append('valor', valor); 
 
       btn.disabled = true; // Desabilita o botão para evitar varios cliques
-
+      
       // Envia os dados via fetch (AJAX)
       fetch(`http://localhost/proj/Investimentos-backend/index.php?action=editar&id=${id}`, {
         method: 'POST',
         body: formData // Envia os dados do formulário
       })
+    
       .then(response => response.text()) 
       .then(text => {
         alert('Investimento editado com sucesso!'); // Alerta de sucesso
@@ -102,9 +114,11 @@
         alert('Erro ao editar investimento.'); // Alerta de erro
         console.error(err); // Loga o erro no console
       })
+      
       .finally(() => {
         btn.disabled = false; // Reabilita o botão
       });
+    
     }
 
     // Função para excluir um investimento

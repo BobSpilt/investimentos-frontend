@@ -68,10 +68,15 @@
     dados.append("tipo", tipo);
 
     // Envia os dados via fetch (AJAX)
+    if (data > hoje || valor < 0) {
+      alert("Valores invalidos: Verifique os campos digitados.");
+      return;
+    }else{
     fetch("http://localhost/proj/investimentos-backend/index.php?action=cadastrar", {
       method: "POST",
       body: dados,
     })
+  
     .then(response => {
       if (response.ok) {
         alert("Cadastro realizado com sucesso!");
@@ -85,6 +90,7 @@
       alert("Erro ao conectar com o servidor.");
     });
   }
+}
 </script>
 
         </div>
