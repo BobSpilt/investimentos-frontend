@@ -38,4 +38,4 @@ O front-end foi construído com **HTML**, **CSS** e **JavaScript puro**, utiliza
 3. Acesse o repositório do back-end e siga as instruções do arquivo `README.md`:
 - Configuração da conexão com o banco
 - Importação do banco via phpMyAdmin
-- Posicionamento da pasta `backend` corretamente em `htdocs/proj/investimentos-backend`
+- Posicionamento da pasta `investimentos-backend` corretamente em `htdocs/proj/`
