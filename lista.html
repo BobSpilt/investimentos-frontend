@@ -1,14 +1,133 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Lista de Investimentos</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <title>Lista de Investimentos</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <h1>Lista de Investimento</h1>
-    <form>
-        <button onclick="window.location.href='cadastro.html'">Lista de Investimentos</button>
-    </form>
+  <h1>Lista de Investimentos</h1>
+
+  <div class="container_lista">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Data</th>
+          <th>Valor</th>
+          <th colspan="2">Gerenciar</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-investimentos"></tbody> <!-- Corpo da tabela onde os investimentos serão listados -->
+    </table>
+  </div>
+
+  <!-- Botão para redirecionar para a página de cadastro de investimentos -->
+   <div class="voltar">
+    <button onclick="window.location.href='cadastro.html'" class="btn_voltar">Cadastro de Investimentos</button>
+    </div>
+  <script>
+    // Função para carregar os investimentos da API
+    function carregarInvestimentos() {
+      fetch('http://localhost/proj/Investimentos-backend/index.php?action=json') // Faz uma requisição para obter os investimentos
+        .then(response => response.json()) // Converte a resposta em JSON
+        .then(data => {
+          const tbody = document.getElementById('tabela-investimentos'); // Seleciona o corpo da tabela
+          tbody.innerHTML = ''; // Limpa o conteúdo anterior da tabela
+
+          // Itera sobre cada item retornado da API
+          data.forEach(item => {
+  const tr = document.createElement('tr'); // Cria uma nova linha para a tabela
+  tr.innerHTML = `
+    <td>${item.id}</td>
+    <td><input name="nome" value="${item.nome}" required></td>
+    <td>
+      <select name="tipo" required>
+        <option value="Ação" ${item.tipo === 'Ação' ? 'selected' : ''}>Ação</option>
+        <option value="Fundo" ${item.tipo === 'Fundo' ? 'selected' : ''}>Fundo</option>
+        <option value="Título" ${item.tipo === 'Título' ? 'selected' : ''}>Título</option>
+      </select>
+    </td>
+    <td><input type="date" name="data" value="${item.data}" required></td>
+    <td><input type="number" name="valor" value="${item.valor}" required></td>
+    <td><button type="button" class="btn_editar" onclick="editarInvestimento(${item.id}, this)">Editar</button></td>
+    <td><button type="button" class="btn_excluir" onclick="excluirInvestimento(${item.id})">Excluir</button></td>
+  `;
+  tbody.appendChild(tr); // Adiciona a nova linha ao corpo da tabela
+
+  // Aqui você limita a data para hoje ou menos
+  const inputData = tr.querySelector('input[name="data"]');
+  const hoje = new Date().toISOString().split('T')[0];
+  inputData.max = hoje;
+});
+        })
+        .catch(err => {
+          alert('Erro ao carregar investimentos.'); // Exibe um alerta em caso de erro
+          console.error(err); // Loga o erro no console
+        });
+    }
+
+    // Função para editar um investimento
+    function editarInvestimento(id, btn) {
+        if (!confirm('Confirma essa alteração?')) return; // Confirma a edição com o usuário
+      const tr = btn.closest('tr'); // Seleciona a linha correspondente ao botão clicado
+      const nome = tr.querySelector('input[name="nome"]').value; // Obtém o valor do campo nome
+      const tipo = tr.querySelector('select[name="tipo"]').value; // Obtém o valor do campo tipo
+      const data = tr.querySelector('input[name="data"]').value; // Obtém o valor do campo data
+      const valor = tr.querySelector('input[name="valor"]').value; // Obtém o valor do campo valor
+
+      // Cria FormData para enviar via POST
+      const formData = new FormData();
+      formData.append('id', id); // Adiciona o ID do investimento
+      formData.append('nome', nome); // Adiciona o nome do investimento
+      formData.append('tipo', tipo); // Adiciona o tipo do investimento
+      formData.append('data', data); // Adiciona a data do investimento
+      formData.append('valor', valor); // Adiciona o valor do investimento
+
+      btn.disabled = true; // Desabilita o botão para evitar múltiplos cliques
+
+      // Faz a requisição para editar o investimento
+      fetch(`http://localhost/proj/Investimentos-backend/index.php?action=editar&id=${id}`, {
+        method: 'POST',
+        body: formData // Envia os dados do formulário
+      })
+      .then(response => response.text()) 
+      .then(text => {
+        alert('Investimento editado com sucesso!'); // Alerta de sucesso
+        carregarInvestimentos(); // Recarrega a lista de investimentos
+      })
+      .catch(err => {
+        alert('Erro ao editar investimento.'); // Alerta de erro
+        console.error(err); // Loga o erro no console
+      })
+      .finally(() => {
+        btn.disabled = false; // Reabilita o botão
+      });
+    }
+
+    // Função para excluir um investimento
+    function excluirInvestimento(id) {
+      if (!confirm('Confirma exclusão do investimento?')) return; // Confirma a exclusão com o usuário
+
+      // Faz a requisição para excluir o investimento
+      fetch(`http://localhost/proj/Investimentos-backend/index.php?action=excluir&id=${id}`, {
+        method: 'GET'
+      })
+      .then(response => response.text())
+      .then(text => {
+        alert('Investimento excluído com sucesso!'); // Alerta de sucesso
+        carregarInvestimentos(); // Recarrega a lista de investimentos
+      })
+      .catch(err => {
+        alert('Erro ao excluir investimento.'); // Alerta de erro
+        console.error(err); // Loga o erro no console
+      });
+    }
+
+    // Carrega os investimentos ao carregar a página
+    window.onload = carregarInvestimentos;
+  </script>
 </body>
 </html>
