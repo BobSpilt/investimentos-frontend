@@ -20,24 +20,23 @@
           <th colspan="2">Gerenciar</th>
         </tr>
       </thead>
-      <tbody id="tabela-investimentos"></tbody> <!-- Corpo da tabela onde os investimentos serão listados -->
+      <tbody id="tabela-investimentos"></tbody> 
     </table>
   </div>
 
-  <!-- Botão para redirecionar para a página de cadastro de investimentos -->
+  <!-- Botão de volatar para cadastro de investimentos -->
    <div class="voltar">
     <button onclick="window.location.href='cadastro.html'" class="btn_voltar">Cadastro de Investimentos</button>
     </div>
   <script>
-    // Função para carregar os investimentos da API
+    // Função que carrega os investimentos da API
     function carregarInvestimentos() {
       fetch('http://localhost/proj/Investimentos-backend/index.php?action=json') // Faz uma requisição para obter os investimentos
         .then(response => response.json()) // Converte a resposta em JSON
         .then(data => {
-          const tbody = document.getElementById('tabela-investimentos'); // Seleciona o corpo da tabela
+          const tbody = document.getElementById('tabela-investimentos'); // Corpo da tabela
           tbody.innerHTML = ''; // Limpa o conteúdo anterior da tabela
 
-          // Itera sobre cada item retornado da API
           data.forEach(item => {
   const tr = document.createElement('tr'); // Cria uma nova linha para a tabela
   tr.innerHTML = `
@@ -79,16 +78,17 @@
       const valor = tr.querySelector('input[name="valor"]').value; // Obtém o valor do campo valor
 
       // Cria FormData para enviar via POST
+      // Adiciona os dados do investimento
       const formData = new FormData();
-      formData.append('id', id); // Adiciona o ID do investimento
-      formData.append('nome', nome); // Adiciona o nome do investimento
-      formData.append('tipo', tipo); // Adiciona o tipo do investimento
-      formData.append('data', data); // Adiciona a data do investimento
-      formData.append('valor', valor); // Adiciona o valor do investimento
+      formData.append('id', id); 
+      formData.append('nome', nome); 
+      formData.append('tipo', tipo); 
+      formData.append('data', data); 
+      formData.append('valor', valor); 
 
-      btn.disabled = true; // Desabilita o botão para evitar múltiplos cliques
+      btn.disabled = true; // Desabilita o botão para evitar varios cliques
 
-      // Faz a requisição para editar o investimento
+      // Envia os dados via fetch (AJAX)
       fetch(`http://localhost/proj/Investimentos-backend/index.php?action=editar&id=${id}`, {
         method: 'POST',
         body: formData // Envia os dados do formulário
